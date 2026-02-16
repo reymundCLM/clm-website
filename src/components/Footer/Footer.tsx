@@ -1,37 +1,46 @@
-"use client";
-
 import React from "react";
-import { FaMapMarkedAlt } from "react-icons/fa";
-import { FaFacebook, FaLinkedin, FaYoutube } from "react-icons/fa6";
+import { FaFacebook, FaLinkedin, FaYoutube, FaPhone, FaEnvelope, FaMapMarkerAlt, FaMapMarkedAlt, FaClock } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
+import { getAllServices } from "@/lib/api";
 
-const Footer: React.FC = () => {
+const Footer = async () => {
   const currentYear = new Date().getFullYear();
 
-  const usefulLinks = [
-    { name: "Meet the Team", href: "/meet-the-team#meetOurTeam" },
+  const services = await getAllServices();
+
+  const quickLinks = [
+    { name: "About Confluence", href: "/meet-the-team" },
+    // { name: "Meet the Team", href: "/meet-the-team#meetOurTeam" },
     { name: "Technical SEO", href: "/technical-seo" },
     { name: "Confluence AI", href: "/confluence-ai" },
-    { name: "Privacy Policy", href: "/privacy-policy" },
+    // { name: "Capabilities", href: "#" },
+    // { name: "SEO Case Studies", href: "#" },
   ];
 
   const socialLinks = [
-    { name: "Facebook", href: "https://www.facebook.com/Confluencelocalmarketing/", icon: <FaFacebook size={18} /> },
-    { name: "YouTube", href: "https://www.youtube.com/c/Confluencelocalmarketing", icon: <FaYoutube size={18} /> },
-    { name: "LinkedIn", href: "https://www.linkedin.com/company/confluence-local-marketing", icon: <FaLinkedin size={18} /> },
-    { name: "Maps", href: "https://www.google.com/maps/place/Confluence+Local+Marketing/@41.8052949,-88.2044818,17z/data=!3m1!4b1!4m6!3m5!1s0x880e57eff5fc1b93:0x67296514c59f316d!8m2!3d41.8052949!4d-88.2019069!16s%2Fg%2F11gxx60q18?entry=ttu&g_ep=EgoyMDI2MDIwMS4wIKXMDSoKLDEwMDc5MjA2N0gBUAM%3D", icon: <FaMapMarkedAlt size={18} /> }
+    { name: "YouTube", href: "https://www.youtube.com/c/Confluencelocalmarketing", icon: <FaYoutube size={16} /> },
+    { name: "Facebook", href: "https://www.facebook.com/Confluencelocalmarketing/", icon: <FaFacebook size={16} /> },
+    { name: "LinkedIn", href: "https://www.linkedin.com/company/confluence-local-marketing", icon: <FaLinkedin size={16} /> },
+    { name: "Maps", href: "https://www.google.com/maps/place/Confluence+Local+Marketing/@41.8052949,-88.2044818,17z/data=!3m1!4b1!4m6!3m5!1s0x880e57eff5fc1b93:0x67296514c59f316d!8m2!3d41.8052949!4d-88.2019069!16s%2Fg%2F11gxx60q18?entry=ttu&g_ep=EgoyMDI2MDIwMS4wIKXMDSoKLDEwMDc5MjA2N0gBUAM%3D", icon: <FaMapMarkedAlt size={16} /> },
+
   ];
 
-  return (
-    <footer className="bg-[#0f172a] text-zinc-400 border-t border-zinc-900">
-      <div className="max-w-7xl mx-auto px-6 py-16 lg:py-20 lg:px-8">
-        {/* Adjusted Grid: 1 col on mobile, 2 on tablet, 4 on desktop */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 text-center sm:text-left">
+  const linkHighlightClass = "text-sm text-slate-400 hover:text-white hover:bg-[#267b9a]/20 px-3 py-1.5 -ml-3 rounded-md hover:translate-x-1 transition-all duration-300 inline-block font-medium";
 
-          {/* Column 1: Brand & Contact */}
-          <div className="flex flex-col items-center sm:items-start space-y-6">
-            <Link href="/" className="inline-block transition-opacity hover:opacity-80">
+  const formatServiceName = (name: string) => {
+    if (!name) return "";
+    return name.replace(/Services?|Agency|Consultant/gi, '').trim();
+  };
+
+  return (
+    <footer className="bg-[#0f172a] text-slate-300 border-t border-slate-800/50 font-sans">
+      <div className="max-w-[1440px] mx-auto px-6 py-16 lg:py-20 lg:px-10">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 text-left">
+
+          <div className="flex flex-col items-start space-y-8 lg:col-span-1">
+            <Link href="/" className="inline-block transition-transform hover:scale-105 duration-300 -ml-2">
               <Image
                 src="/ConfluenceLogo.webp"
                 alt="Confluence Marketing Logo"
@@ -40,54 +49,26 @@ const Footer: React.FC = () => {
                 className="h-12 w-auto object-contain"
               />
             </Link>
-            <div className="space-y-3 text-sm leading-relaxed">
-              <p className="flex items-center justify-center sm:justify-start gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#267b9a] hidden sm:block" />
-                Mon-Fri: 9:00 AM – 5:00 PM
-              </p>
-              <p className="max-w-[200px] sm:max-w-none mx-auto sm:mx-0">
-                2020 Calamos Ct, Naperville, IL 60563
-              </p>
-              <a href="tel:6304478434" className="block text-[#267b9a] font-black text-lg hover:text-[#40a9cf] transition-colors">
-                630-447-8434
-              </a>
+
+            <div className="space-y-4 text-sm text-slate-400">
+              <div className="flex items-start gap-3">
+                <FaMapMarkerAlt className="text-[#267b9a] mt-1 shrink-0" size={14} />
+                <p>2020 Calamos Ct,<br />Naperville, IL 60563</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <FaClock className="text-[#267b9a] shrink-0" size={14} />
+                <p>Mon-Fri: 9:00 AM – 5:00 PM</p>
+              </div>
             </div>
-          </div>
 
-          {/* Column 2: Useful Links */}
-          <div className="space-y-6">
-            <h3 className="text-white font-black uppercase tracking-widest text-xs">Navigation</h3>
-            <ul className="space-y-4">
-              {usefulLinks.map((link) => (
-                <li key={link.name}>
-                  <Link href={link.href} className="text-sm hover:text-[#267b9a] transition-all duration-300 inline-block">
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 3: Capabilities */}
-          <div className="space-y-6">
-            <h3 className="text-white font-black uppercase tracking-widest text-xs">Capabilities</h3>
-            <p className="text-sm leading-relaxed max-w-xs mx-auto sm:mx-0">
-              Empowering U.S. brands through AI-driven SEO, programmatic scaling,
-              and generative search optimization.
-            </p>
-          </div>
-
-          {/* Column 4: Social Presence */}
-          <div className="space-y-6">
-            <h3 className="text-white font-black uppercase tracking-widest text-xs">Connect</h3>
-            <div className="flex justify-center sm:justify-start flex-wrap gap-4">
+            <div className="flex flex-wrap gap-3">
               {socialLinks.map((social) => (
                 <a
                   key={social.name}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-11 h-11 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:bg-[#267b9a] hover:text-white hover:border-[#267b9a] hover:-translate-y-1 transition-all duration-300"
+                  className="w-9 h-9 rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center text-white hover:bg-[#267b9a] hover:border-[#267b9a] hover:-translate-y-1 hover:shadow-[0_5px_15px_rgba(38,123,154,0.4)] transition-all duration-300"
                 >
                   <span className="sr-only">{social.name}</span>
                   {social.icon}
@@ -95,19 +76,88 @@ const Footer: React.FC = () => {
               ))}
             </div>
           </div>
+
+          {/* Column 2 & 3: Services (Spans 2 columns, labels dynamically shortened) */}
+          <div className="space-y-6 lg:col-span-2">
+            <h3 className="text-white font-bold text-lg">Services</h3>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1">
+              {services.map((service) => {
+                const rawName = service.metaTitle || service.slug;
+                const shortName = formatServiceName(rawName);
+
+                return (
+                  <li key={service.id}>
+                    <Link href={`/services/${service.slug}`} className={linkHighlightClass}>
+                      {shortName}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          {/* Column 4: Quick Links (Combined Resources & Learn More) */}
+          <div className="space-y-6 lg:col-span-1">
+            <h3 className="text-white font-bold text-lg">Quick Links</h3>
+            <ul className="space-y-1">
+              {quickLinks.map((link) => (
+                <li key={link.name}>
+                  <Link href={link.href} className={linkHighlightClass}>
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 5: Contact Us */}
+          <div className="space-y-6 lg:col-span-1">
+            <h3 className="text-white font-bold text-lg">Contact Us</h3>
+            <div className="space-y-5 text-sm text-slate-400">
+
+              {/* Phone */}
+              <div>
+                <div className="flex items-center gap-2 mb-2 text-white font-medium">
+                  <FaPhone className="text-[#267b9a]" size={14} />
+                  Phone:
+                </div>
+                <ul className="pl-6">
+                  <li>
+                    <a href="tel:6304478434" className={linkHighlightClass}>
+                      🇺🇸 +1 630 447 8434
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Email */}
+              <div>
+                <div className="flex items-center gap-2 mb-2 text-white font-medium">
+                  <FaEnvelope className="text-[#267b9a]" size={14} />
+                  Email:
+                </div>
+                <ul className="pl-6">
+                  <li>
+                    <Link href="/contact-us" className={linkHighlightClass}>
+                      Contact Us Today
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-16 pt-8 border-t border-zinc-900 flex flex-col items-center justify-between gap-6 sm:flex-row text-center sm:text-left">
-          <p className="text-[10px] sm:text-xs tracking-wide text-zinc-500">
-            © {currentYear} Confluence Local Marketing. <br className="sm:hidden" />
-            Powered by AI Insight.
+        {/* Bottom Bar (Only ONE Privacy Policy exists here now) */}
+        <div className="mt-20 pt-8 border-t border-slate-800/80 text-center">
+          <p className="text-sm text-slate-500 flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+            <span>© Copyright {currentYear} www.confluencelocalmarketing.com</span>
+            <span className="hidden sm:inline">|</span>
+            <span>All Rights Reserved</span>
+            <span className="hidden sm:inline">|</span>
+            <Link href="/privacy-policy" className="hover:text-white hover:underline transition-colors">Privacy Policy</Link>
           </p>
-          <div className="flex gap-8 text-[10px] sm:text-xs font-bold uppercase tracking-widest">
-            <Link href="/privacy-policy" className="hover:text-white transition-colors sm:text-xs">
-              Privacy Policy
-            </Link>
-          </div>
         </div>
       </div>
     </footer>

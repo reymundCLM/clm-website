@@ -24,6 +24,9 @@ const getIconForSlug = (slug: string) => {
     if (s.includes("content") || s.includes("pen")) return <FaPenFancy />;
     if (s.includes("dev") || s.includes("desktop")) return <FaDesktop />;
     if (s.includes("social") || s.includes("users")) return <FaUsers />;
+    if (s.includes("technical")) return <FaCode />;
+    if (s.includes("audit") || s.includes("scan")) return <FaSearch />;
+    if (s.includes("strategy")) return <FaChartLine />;
     return <FaSearch />;
 };
 
@@ -38,8 +41,8 @@ export default function ServicesClientWrapper({ initialServices }: { initialServ
             <div className="absolute top-1/4 -right-20 w-[600px] h-[600px] bg-[#267b9a]/10 blur-[150px] rounded-full pointer-events-none" />
             <div className="absolute bottom-1/4 -left-20 w-[600px] h-[600px] bg-[#40a9cf]/10 blur-[150px] rounded-full pointer-events-none" />
 
-            <motion.div 
-                layout 
+            <motion.div
+                layout
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10"
             >
                 <AnimatePresence mode="popLayout">

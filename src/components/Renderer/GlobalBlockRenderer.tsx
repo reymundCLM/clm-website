@@ -231,30 +231,27 @@ const FaqItem = ({ item }: { item: ComponentFaqItem }) => {
     <div className="mb-6">
       <motion.div
         initial={false}
-        className={`group border transition-all duration-500 rounded-[2rem] overflow-hidden ${
-          isOpen
+        className={`group border transition-all duration-500 rounded-[2rem] overflow-hidden ${isOpen
             ? "bg-white border-[#267b9a]/30 shadow-[0_20px_50px_rgba(38,123,154,0.15)]"
             : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-md"
-        }`}
+          }`}
       >
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="w-full flex justify-between items-center px-8 py-7 text-left outline-none bg-transparent"
         >
           <span
-            className={`text-lg md:text-xl font-bold tracking-tight transition-colors duration-300 ${
-              isOpen ? "text-[#267b9a]" : "text-slate-800 group-hover:text-slate-900"
-            }`}
+            className={`text-lg md:text-xl font-bold tracking-tight transition-colors duration-300 ${isOpen ? "text-[#267b9a]" : "text-slate-800 group-hover:text-slate-900"
+              }`}
           >
             {item.title}
           </span>
 
           <div
-            className={`flex-shrink-0 ml-4 w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-500 ${
-              isOpen
+            className={`flex-shrink-0 ml-4 w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-500 ${isOpen
                 ? "bg-[#267b9a] border-[#267b9a] text-white rotate-180 shadow-[0_0_15px_rgba(38,123,154,0.4)]"
                 : "bg-slate-50 border-slate-200 text-slate-400 rotate-0"
-            }`}
+              }`}
           >
             <svg
               className="w-4 h-4"
@@ -279,7 +276,7 @@ const FaqItem = ({ item }: { item: ComponentFaqItem }) => {
               <div className="px-8 pb-8">
                 {/* Visual Divider consistent with your card design */}
                 <div className="h-[1px] w-full bg-gradient-to-r from-slate-100 via-slate-50 to-transparent mb-6" />
-                
+
                 <div className="prose prose-slate max-w-none text-slate-600 text-base md:text-lg leading-relaxed">
                   {renderRichText(item.content, "text-slate-600")}
                 </div>
@@ -393,7 +390,7 @@ export default function ConfluenceBlockRenderer({ blocks }: RendererProps) {
           <div className="absolute inset-0 w-full h-full z-0">
             <Image
               src={heroImage.background.url}
-              alt="Hero"
+              alt={heroImage.background.alternativeText || `${heroHeading?.heading || 'Confluence'} Hero Image`}
               fill
               className="object-cover opacity-30 mix-blend-overlay"
               priority
@@ -541,7 +538,7 @@ export default function ConfluenceBlockRenderer({ blocks }: RendererProps) {
                     <div className="relative group">
                       <div className="absolute -inset-4 bg-[#267b9a]/20 rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                       <div className="relative w-full overflow-hidden rounded-[2rem] shadow-2xl border border-slate-200/50">
-                        <Image src={image.url} alt={image.alternativeText || "Content image"} width={image.width} height={image.height} className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105" />
+                        <Image src={image.url} alt={image.alternativeText || `${heroHeading?.heading || 'Confluence'} Service Detail Image`} width={image.width} height={image.height} className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105" />
                       </div>
                     </div>
                   )}
@@ -571,7 +568,7 @@ export default function ConfluenceBlockRenderer({ blocks }: RendererProps) {
               return (
                 <BlockWrapper key={key} className="max-w-6xl mx-auto px-6 my-24">
                   <div className="relative w-full overflow-hidden rounded-[2rem] shadow-2xl border border-slate-200">
-                    <Image src={imageBlock.singleImage.url} alt={imageBlock.singleImage.alternativeText || "Content image"} width={imageBlock.singleImage.width} height={imageBlock.singleImage.height} className="w-full h-auto object-cover" />
+                    <Image src={imageBlock.singleImage.url} alt={imageBlock.singleImage.alternativeText || `${heroHeading?.heading || 'Confluence'} Content Image`} width={imageBlock.singleImage.width} height={imageBlock.singleImage.height} className="w-full h-auto object-cover" />
                   </div>
                 </BlockWrapper>
               );

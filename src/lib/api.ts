@@ -562,3 +562,14 @@ export async function getAllServices(): Promise<ServicePageData[]> {
     return [];
   }
 }
+
+export function flattenNavTree(items: NavigationItem[]): NavigationItem[] {
+  let flat: NavigationItem[] = [];
+  for (const item of items) {
+    flat.push(item);
+    if (item.items && item.items.length > 0) {
+      flat = flat.concat(flattenNavTree(item.items));
+    }
+  }
+  return flat;
+}

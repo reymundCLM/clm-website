@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
 import Link from 'next/link';
+import type { Metadata } from "next";
 
 // --- ANIMATION VARIANTS ---
 const fadeInUp: Variants = {
@@ -14,33 +15,25 @@ const fadeInUp: Variants = {
   }
 };
 
-// 
 const staggerContainer = {
   visible: { transition: { staggerChildren: 0.1 } }
 };
+
 export default function ContactPage() {
 
-  // --- THE FIX: Clean Script Injection ---
   useEffect(() => {
     const scriptId = 'paperform-embed-script';
-
-    // 1. Remove any existing Paperform script to prevent conflicts
     const existingScript = document.getElementById(scriptId);
     if (existingScript) {
       existingScript.remove();
     }
 
-    // 2. Create a fresh script tag
     const script = document.createElement('script');
     script.src = "https://paperform.co/__embed.min.js";
     script.id = scriptId;
     script.async = true;
-
-    // 3. Append it to the body. This forces the script to run from scratch
-    // and find the <div data-paperform-id> automatically.
     document.body.appendChild(script);
 
-    // 4. Cleanup on unmount
     return () => {
       const scriptToRemove = document.getElementById(scriptId);
       if (scriptToRemove) {
@@ -51,7 +44,6 @@ export default function ContactPage() {
 
   return (
     <div className="bg-white flex flex-col min-h-screen">
-
       {/* --- HERO SECTION --- */}
       <section className="relative w-full min-h-[45vh] flex items-center justify-center bg-[#0f172a] overflow-hidden px-4">
         <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-[#267b9a] rounded-full mix-blend-screen filter blur-[120px] opacity-20 animate-pulse pointer-events-none"></div>
@@ -72,14 +64,15 @@ export default function ContactPage() {
             animate={{ width: 96 }}
             transition={{ delay: 0.5, duration: 0.8 }}
             className="h-1.5 bg-gradient-to-r from-[#267b9a] to-cyan-400 rounded-full shadow-[0_0_20px_rgba(38,123,154,0.6)] mx-auto mb-10"
-          />          <p className="text-xl text-gray-100/90 leading-relaxed max-w-2xl mx-auto">
+          />
+          <p className="text-xl text-gray-100/90 leading-relaxed max-w-2xl mx-auto">
             Have a project in mind or just want to say hi? We'd love to hear from you.
           </p>
         </motion.div>
       </section>
-      <section className="relative bg-zinc-50 py-24 lg:py-40 overflow-hidden">
 
-        {/* 1. TOP WAVE (Aligning with HowItWorks) */}
+      <section className="relative bg-zinc-50 py-16 lg:py-32 overflow-hidden">
+        {/* 1. TOP WAVE */}
         <div className="absolute top-0 left-0 w-full h-48 overflow-hidden leading-[0] z-10 pointer-events-none">
           <svg className="relative block w-full h-full transform scale-x-110" viewBox="0 0 1200 120" preserveAspectRatio="none">
             <defs>
@@ -95,6 +88,7 @@ export default function ContactPage() {
         {/* 2. PARALLAX ACCENT BLOBS */}
         <div className="absolute top-1/4 -right-20 w-[500px] h-[500px] bg-[#267b9a]/5 blur-[120px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 -left-20 w-[400px] h-[400px] bg-[#40a9cf]/10 blur-[100px] rounded-full pointer-events-none" />
+
         {/* 3. MAIN CONTENT */}
         <div className="relative z-20 max-w-7xl mx-auto px-6">
           <motion.div
@@ -102,37 +96,35 @@ export default function ContactPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-50px" }}
-            className="grid lg:grid-cols-5 gap-16 items-start"
+            className="grid lg:grid-cols-5 gap-12 lg:gap-16 items-start"
           >
-
-            {/* LEFT COLUMN: Contact Info (Sticky Heading Style) */}
+            {/* LEFT COLUMN: Contact Info */}
             <motion.div variants={fadeInUp} className="lg:col-span-2 space-y-10">
               <div className="lg:sticky lg:top-32">
-                <h2 className="text-5xl md:text-6xl font-bold text-zinc-900 leading-[1.1] mb-8 tracking-tight">
+                <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-zinc-900 leading-[1.1] mb-8 tracking-tight">
                   Let's start a <span className="bg-gradient-to-r from-[#267b9a] to-[#40a9cf] bg-clip-text text-transparent italic font-light">conversation.</span>
                 </h2>
                 <p className="text-zinc-500 text-lg md:text-xl max-w-sm leading-relaxed mb-12">
                   Whether you have a question about features, pricing, or need a demo, our team is ready to scale with you.
                 </p>
 
-                {/* Contact Items - Glassmorphism style */}
                 <div className="space-y-4">
-                  {/* Email Item */}
-                  <div className="flex items-center p-6 bg-white/40 backdrop-blur-xl border border-zinc-200/50 rounded-[2rem] hover:bg-white hover:shadow-2xl hover:shadow-zinc-200/50 transition-all duration-500 group">
-                    <div className="shrink-0 w-12 h-12 rounded-2xl bg-[#267b9a] text-white flex items-center justify-center shadow-lg shadow-[#267b9a]/20">
+                  {/* Actionable Email Item */}
+                  <a href="mailto:station@confluencelocalmarketing.com" className="flex items-center p-6 bg-white/40 backdrop-blur-xl border border-zinc-200/50 rounded-[2rem] hover:bg-white hover:shadow-2xl hover:shadow-zinc-200/50 transition-all duration-500 group">
+                    <div className="shrink-0 w-12 h-12 rounded-2xl bg-[#267b9a] text-white flex items-center justify-center shadow-lg shadow-[#267b9a]/20 transition-transform group-hover:scale-110">
                       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
                     </div>
                     <div className="ml-6">
                       <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Email Us</h3>
-                      <p className="text-lg font-bold text-zinc-900 break-all">station@confluencelocalmarketing.com</p>
+                      <p className="text-normal font-bold text-zinc-900 break-all group-hover:text-[#267b9a] transition-colors">station@confluencelocalmarketing.com</p>
                     </div>
-                  </div>
+                  </a>
 
-                  {/* Location Item */}
-                  <div className="flex items-center p-6 bg-white/40 backdrop-blur-xl border border-zinc-200/50 rounded-[2rem] hover:bg-white hover:shadow-2xl hover:shadow-zinc-200/50 transition-all duration-500 group">
-                    <div className="shrink-0 w-12 h-12 rounded-2xl bg-zinc-900 text-white flex items-center justify-center shadow-lg">
+                  {/* Actionable Location Item */}
+                  <a href="https://maps.google.com/?q=2020+Calamos+Ct,Naperville,IL+60563" target="_blank" rel="noopener noreferrer" className="flex items-center p-6 bg-white/40 backdrop-blur-xl border border-zinc-200/50 rounded-[2rem] hover:bg-white hover:shadow-2xl hover:shadow-zinc-200/50 transition-all duration-500 group">
+                    <div className="shrink-0 w-12 h-12 rounded-2xl bg-zinc-900 text-white flex items-center justify-center shadow-lg transition-transform group-hover:scale-110">
                       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -140,28 +132,27 @@ export default function ContactPage() {
                     </div>
                     <div className="ml-6">
                       <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Our Office</h3>
-                      <p className="text-lg font-bold text-zinc-900">Naperville, IL 60563, USA</p>
+                      <p className="text-normal font-bold text-zinc-900 group-hover:text-[#267b9a] transition-colors">Naperville, IL 60563, USA</p>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* RIGHT COLUMN: Paperform Embed */}
+            <motion.div variants={fadeInUp} className="lg:col-span-3">
+              <div className="relative group">
+                <div className="absolute -inset-4 bg-gradient-to-r from-[#267b9a]/20 to-[#40a9cf]/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                <div className="relative bg-white backdrop-blur-2xl rounded-[3rem] shadow-2xl shadow-zinc-200/50 border border-zinc-200 overflow-hidden p-2">
+                  <div className="bg-zinc-50/50 rounded-[2.5rem] min-h-[500px] md:min-h-[600px] flex items-center justify-center">
+                    <div className="w-full" data-paperform-id="smg9wu0g">
+                      {/* Optional: Add a subtle loading state while script initializes */}
+                      <p className="text-center text-zinc-400 font-medium animate-pulse">Initializing Secure Form...</p>
                     </div>
                   </div>
                 </div>
               </div>
             </motion.div>
-
-            {/* RIGHT COLUMN: Paperform Embed (Glass Box) */}
-            <motion.div variants={fadeInUp} className="lg:col-span-3">
-              <div className="relative group">
-                {/* Outer Glow */}
-                <div className="absolute -inset-4 bg-gradient-to-r from-[#267b9a]/20 to-[#40a9cf]/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-                <div className="relative bg-white backdrop-blur-2xl rounded-[3rem] shadow-2xl shadow-zinc-200/50 border border-zinc-200 overflow-hidden p-2">
-                  <div className="bg-zinc-50/50 rounded-[2.5rem] min-h-[600px] flex items-center justify-center">
-                    {/* The Paperform DIV */}
-                    <div className="w-full" data-paperform-id="smg9wu0g"></div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
           </motion.div>
         </div>
       </section>
