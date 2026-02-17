@@ -110,7 +110,7 @@ export default function ContactPage() {
 
                 <div className="space-y-4">
                   {/* Actionable Email Item */}
-                  <a href="mailto:station@confluencelocalmarketing.com" className="flex items-center p-6 bg-white/40 backdrop-blur-xl border border-zinc-200/50 rounded-[2rem] hover:bg-white hover:shadow-2xl hover:shadow-zinc-200/50 transition-all duration-500 group">
+                  {/* <a href="mailto:station@confluencelocalmarketing.com" className="flex items-center p-6 bg-white/40 backdrop-blur-xl border border-zinc-200/50 rounded-[2rem] hover:bg-white hover:shadow-2xl hover:shadow-zinc-200/50 transition-all duration-500 group">
                     <div className="shrink-0 w-12 h-12 rounded-2xl bg-[#267b9a] text-white flex items-center justify-center shadow-lg shadow-[#267b9a]/20 transition-transform group-hover:scale-110">
                       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -120,7 +120,7 @@ export default function ContactPage() {
                       <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Email Us</h3>
                       <p className="text-normal font-bold text-zinc-900 break-all group-hover:text-[#267b9a] transition-colors">station@confluencelocalmarketing.com</p>
                     </div>
-                  </a>
+                  </a> */}
 
                   {/* Actionable Location Item */}
                   <a href="https://maps.google.com/?q=2020+Calamos+Ct,Naperville,IL+60563" target="_blank" rel="noopener noreferrer" className="flex items-center p-6 bg-white/40 backdrop-blur-xl border border-zinc-200/50 rounded-[2rem] hover:bg-white hover:shadow-2xl hover:shadow-zinc-200/50 transition-all duration-500 group">
