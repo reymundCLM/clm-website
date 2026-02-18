@@ -2,12 +2,18 @@ import React from "react";
 import { FaFacebook, FaLinkedin, FaYoutube, FaPhone, FaEnvelope, FaMapMarkerAlt, FaMapMarkedAlt, FaClock } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
-import { getAllServices } from "@/lib/api";
+import { getAllServices, getGlobalData } from "@/lib/api";
+
+const STRAPI_BASE_URL = "https://ancient-crown-9dfaf5bb18.strapiapp.com";
 
 const Footer = async () => {
   const currentYear = new Date().getFullYear();
 
-  const services = await getAllServices();
+  // Fetch services and global data (for logo) in parallel
+  const [services, globalData] = await Promise.all([
+    getAllServices(),
+    getGlobalData(),
+  ]);
 
   const quickLinks = [
     { name: "About Confluence", href: "/meet-the-team" },
@@ -23,7 +29,6 @@ const Footer = async () => {
     { name: "Facebook", href: "https://www.facebook.com/Confluencelocalmarketing/", icon: <FaFacebook size={16} /> },
     { name: "LinkedIn", href: "https://www.linkedin.com/company/confluence-local-marketing", icon: <FaLinkedin size={16} /> },
     { name: "Maps", href: "https://www.google.com/maps/place/Confluence+Local+Marketing/@41.8052949,-88.2044818,17z/data=!3m1!4b1!4m6!3m5!1s0x880e57eff5fc1b93:0x67296514c59f316d!8m2!3d41.8052949!4d-88.2019069!16s%2Fg%2F11gxx60q18?entry=ttu&g_ep=EgoyMDI2MDIwMS4wIKXMDSoKLDEwMDc5MjA2N0gBUAM%3D", icon: <FaMapMarkedAlt size={16} /> },
-
   ];
 
   const linkHighlightClass = "text-sm text-slate-400 hover:text-white hover:bg-[#267b9a]/20 px-3 py-1.5 -ml-3 rounded-md hover:translate-x-1 transition-all duration-300 inline-block font-medium";
@@ -32,6 +37,14 @@ const Footer = async () => {
     if (!name) return "";
     return name.replace(/Services?|Agency|Consultant/gi, '').trim();
   };
+
+  // Logic to determine the correct logo URL
+  const logoUrl = globalData?.mainLogo?.url;
+  const fullLogoUrl = logoUrl
+    ? (logoUrl.startsWith('http') ? logoUrl : `${STRAPI_BASE_URL}${logoUrl}`)
+    : "/ConfluenceLogo.webp"; // Fallback if Strapi data fails
+
+  const siteName = globalData?.siteName || "Confluence Marketing Logo";
 
   return (
     <footer className="bg-[#0f172a] text-slate-300 border-t border-slate-800/50 font-sans">
@@ -42,8 +55,8 @@ const Footer = async () => {
           <div className="flex flex-col items-start space-y-8 lg:col-span-1">
             <Link href="/" className="inline-block transition-transform hover:scale-105 duration-300 -ml-2">
               <Image
-                src="/ConfluenceLogo.webp"
-                alt="Confluence Marketing Logo"
+                src={fullLogoUrl}
+                alt={siteName}
                 width={200}
                 height={54}
                 className="h-12 w-auto object-contain"
