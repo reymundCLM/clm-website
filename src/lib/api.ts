@@ -34,7 +34,30 @@ interface StrapiNavItemRaw {
   parent: { id: number } | null;
 }
 
+// --- CASE STUDIES INTERFACES ---
 
+export interface CaseStudyMetric {
+  id: number;
+  label: string;
+  value: string;
+}
+
+export interface CaseStudyData {
+  id: number;
+  documentId: string;
+  client: string;
+  title: string;
+  description: string;
+  metrics: CaseStudyMetric[];
+  icon?: {
+    iconData: any;
+    width?: number | string;
+    height?: number | string;
+  };
+  category: string;
+  slug: string;
+  content?: any[];
+}
 export interface ServiceRichTextChild {
   text: string;
   type: "text";
@@ -572,4 +595,61 @@ export function flattenNavTree(items: NavigationItem[]): NavigationItem[] {
     }
   }
   return flat;
+}
+// --- NEW FETCHER: Case Studies ---
+
+export async function getCaseStudies(): Promise<CaseStudyData[]> {
+  const endpoint = "/api/case-studies";
+  // Ensure we populate the repeatable metrics and the icon component
+  const query = "populate[metrics][populate]=*&populate[icon][populate]=*";
+  const url = `${STRAPI_URL}${endpoint}?${query}`;
+
+  try {
+    const res = await fetch(url, {
+      next: { revalidate: 60 } // Revalidates cache every 60 seconds
+    });
+
+    if (!res.ok) {
+      console.error(`Error fetching Case Studies: ${res.status}`);
+      return [];
+    }
+
+    const json = await res.json();
+    return json.data || [];
+
+  } catch (error) {
+    console.error("Fetch Case Studies failed:", error);
+    return [];
+  }
+}
+// Add this new fetcher function below your getCaseStudies() function
+export async function getCaseStudyBySlug(slug: string): Promise<CaseStudyData | null> {
+  const endpoint = "/api/case-studies";
+  // We populate metrics, icon, AND the dynamic content zone blocks
+  const query = `filters[slug][$eq]=${slug}&populate[metrics][populate]=*&populate[icon][populate]=*&populate[content][populate]=*`;
+
+  const url = `${STRAPI_URL}${endpoint}?${query}`;
+
+  try {
+    const res = await fetch(url, {
+      next: { revalidate: 60 }
+    });
+
+    if (!res.ok) {
+      console.error(`Error fetching Case Study by slug: ${res.status}`);
+      return null;
+    }
+
+    const json = await res.json();
+
+    // Strapi filters return an array, so we grab the first matching item
+    if (json.data && json.data.length > 0) {
+      return json.data[0];
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Fetch Case Study by slug failed:", error);
+    return null;
+  }
 }
