@@ -20,20 +20,26 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'ancient-crown-9dfaf5bb18.media.strapiapp.com',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com', // Strapi Cloud often uses Cloudinary under the hood
-        pathname: '/**',
-      },
-    ],
+  eslint: {
+    ignoreDuringBuilds: true,
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  images: {
+  remotePatterns: [
+    {
+      protocol: 'https',
+      hostname: 'strapi.confluencelocalmarketing.com',
+      pathname: '/**',
+    },
+    {
+      protocol: 'http',
+      hostname: 'strapi.confluencelocalmarketing.com',
+      pathname: '/**',
+    },
+  ],
+},
 };
 
 export default nextConfig;

@@ -7,7 +7,7 @@ import MobileNavbar from "./MobileNavBar";
 import { NavigationItem } from "@/lib/api";
 import Image from "next/image";
 
-const STRAPI_BASE_URL = "https://ancient-crown-9dfaf5bb18.strapiapp.com";
+const STRAPI_BASE_URL = "https://strapi.confluencelocalmarketing.com";
 
 interface HeaderLayoutProps {
   navItems: NavigationItem[];

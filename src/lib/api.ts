@@ -1,4 +1,4 @@
-const STRAPI_URL = "https://ancient-crown-9dfaf5bb18.strapiapp.com";
+const STRAPI_URL = "https://strapi.confluencelocalmarketing.com";
 
 // --- Existing Interfaces (Global & Nav) ---
 export interface GlobalData {

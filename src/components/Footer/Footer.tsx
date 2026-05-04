@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getAllServices, getGlobalData } from "@/lib/api";
 
-const STRAPI_BASE_URL = "https://ancient-crown-9dfaf5bb18.strapiapp.com";
+const STRAPI_BASE_URL = "https://strapi.confluencelocalmarketing.com";
 
 const Footer = async () => {
   const currentYear = new Date().getFullYear();

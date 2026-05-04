@@ -351,7 +351,7 @@ export default function MeetTheTeamRenderer({ blocks }: RendererProps) {
     b !== heroButton
   );
 
-  let processedBlocks: any[] = [];
+  const processedBlocks: any[] = [];
   let cardBuffer: MeetTheTeamCardItem[] = [];
 
   contentBlocks.forEach((block) => {
