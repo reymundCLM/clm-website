@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { getStrapiMedia } from '@/lib/api'; // ADDED IMPORTS
 
 import {
   ConfluenceBlock,
@@ -118,7 +119,7 @@ const fadeInUp: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } // "Apple" ease
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } 
   }
 };
 
@@ -141,7 +142,6 @@ const renderRichText = (nodes: (ServiceRichTextNode | ServiceRichTextChild | Ric
       const textNode = safeNode as RichTextText;
       let content: React.ReactNode = textNode.text;
 
-      // Logic: If background is dark (text-white/slate-300), keep bold white. Else dark.
       const isDarkBg = textColorClass.includes("white") || textColorClass.includes("slate-300");
 
       if (textNode.bold) content = <strong key="bold" className={`font-bold ${isDarkBg ? "text-white" : "text-slate-900"}`}>{content}</strong>;
@@ -274,7 +274,6 @@ const FaqItem = ({ item }: { item: ComponentFaqItem }) => {
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }} // Match your "Apple" ease
             >
               <div className="px-8 pb-8">
-                {/* Visual Divider consistent with your card design */}
                 <div className="h-[1px] w-full bg-gradient-to-r from-slate-100 via-slate-50 to-transparent mb-6" />
 
                 <div className="prose prose-slate max-w-none text-slate-600 text-base md:text-lg leading-relaxed">
@@ -374,22 +373,18 @@ export default function ConfluenceBlockRenderer({ blocks }: RendererProps) {
 
       {/* --- HERO SECTION --- */}
       <section className="relative w-full min-h-[85vh] flex items-center justify-center bg-[#0f172a] overflow-hidden px-4">
-
-        {/* Animated Tech Background */}
         <div className="absolute inset-0 z-0">
-          {/* Mesh Gradients */}
           <div className="absolute top-[-30%] right-[-10%] w-[800px] h-[800px] bg-[#267b9a] rounded-full mix-blend-screen filter blur-[150px] opacity-20 animate-pulse" style={{ animationDuration: '4s' }} />
           <div className="absolute bottom-[-30%] left-[-10%] w-[600px] h-[600px] bg-indigo-900 rounded-full mix-blend-screen filter blur-[150px] opacity-25" />
-
-          {/* Grid Overlay */}
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] contrast-150 brightness-100" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_75%)]" />
         </div>
 
         {heroImage && heroImage.background?.url && (
           <div className="absolute inset-0 w-full h-full z-0">
+            {/* UPDATED: Wrapped url with getStrapiMedia */}
             <Image
-              src={heroImage.background.url}
+              src={getStrapiMedia(heroImage.background.url) || ""}
               alt={heroImage.background.alternativeText || `${heroHeading?.heading || 'Confluence'} Hero Image`}
               fill
               className="object-cover opacity-30 mix-blend-overlay"
@@ -410,7 +405,6 @@ export default function ConfluenceBlockRenderer({ blocks }: RendererProps) {
               <h1 className="text-5xl md:text-7xl font-bold text-white leading-[1.1] tracking-tight drop-shadow-2xl mb-8">
                 {heroHeading.heading}
               </h1>
-              {/* Decorative Line */}
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: 96 }}
@@ -432,7 +426,6 @@ export default function ConfluenceBlockRenderer({ blocks }: RendererProps) {
               target={heroButton.isExternal ? "_blank" : "_self"}
               className="group relative inline-flex items-center justify-center px-8 py-4 text-sm font-bold uppercase tracking-widest text-white transition-all duration-300 bg-[#267b9a] rounded-lg hover:bg-[#1f637c] hover:shadow-[0_0_40px_rgba(38,123,154,0.5)] hover:-translate-y-1 overflow-hidden"
             >
-              {/* Shine effect */}
               <div className="absolute top-0 -left-[100%] w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent transform skew-x-12 group-hover:animate-shine" />
               <span className="relative z-10">{heroButton.label}</span>
             </Link>
@@ -538,7 +531,8 @@ export default function ConfluenceBlockRenderer({ blocks }: RendererProps) {
                     <div className="relative group">
                       <div className="absolute -inset-4 bg-[#267b9a]/20 rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                       <div className="relative w-full overflow-hidden rounded-[2rem] shadow-2xl border border-slate-200/50">
-                        <Image src={image.url} alt={image.alternativeText || `${heroHeading?.heading || 'Confluence'} Service Detail Image`} width={image.width} height={image.height} className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105" />
+                        {/* UPDATED: Wrapped url with getStrapiMedia */}
+                        <Image src={getStrapiMedia(image.url) || ""} alt={image.alternativeText || `${heroHeading?.heading || 'Confluence'} Service Detail Image`} width={image.width} height={image.height} className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105" />
                       </div>
                     </div>
                   )}
@@ -568,7 +562,8 @@ export default function ConfluenceBlockRenderer({ blocks }: RendererProps) {
               return (
                 <BlockWrapper key={key} className="max-w-6xl mx-auto px-6 my-24">
                   <div className="relative w-full overflow-hidden rounded-[2rem] shadow-2xl border border-slate-200">
-                    <Image src={imageBlock.singleImage.url} alt={imageBlock.singleImage.alternativeText || `${heroHeading?.heading || 'Confluence'} Content Image`} width={imageBlock.singleImage.width} height={imageBlock.singleImage.height} className="w-full h-auto object-cover" />
+                    {/* UPDATED: Wrapped url with getStrapiMedia */}
+                    <Image src={getStrapiMedia(imageBlock.singleImage.url) || ""} alt={imageBlock.singleImage.alternativeText || `${heroHeading?.heading || 'Confluence'} Content Image`} width={imageBlock.singleImage.width} height={imageBlock.singleImage.height} className="w-full h-auto object-cover" />
                   </div>
                 </BlockWrapper>
               );
@@ -579,7 +574,6 @@ export default function ConfluenceBlockRenderer({ blocks }: RendererProps) {
         })}
       </div>
 
-      {/* --- FOOTER CTA (Tech Style) --- */}
       <section className="px-6 pb-24 relative overflow-hidden bg-slate-50/50">
         <motion.div initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="max-w-6xl mx-auto relative group">
           <div className="relative overflow-hidden rounded-[3rem] bg-[#0f172a] shadow-[0_40px_80px_rgba(0,0,0,0.4)]">

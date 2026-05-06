@@ -4,16 +4,32 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { getStrapiMedia } from '@/lib/api';
 
-// --- TYPES (Same as before) ---
+// --- TYPES ---
 interface RichTextChild { text: string; type: "text"; bold?: boolean; italic?: boolean; code?: boolean; }
-interface RichTextNode { type: "paragraph" | "list" | "list-item" | "heading" | "link" | "quote"; format?: "unordered" | "ordered"; level?: 1 | 2 | 3; url?: string; children: (RichTextNode | RichTextChild)[]; }
+interface RichTextNode { 
+  type: "paragraph" | "list" | "list-item" | "heading" | "link" | "quote" | "image"; // ADDED "image"
+  format?: "unordered" | "ordered"; 
+  level?: 1 | 2 | 3; 
+  url?: string; 
+  image?: {
+    url: string;
+    width: number;
+    height: number;
+    alternativeText?: string | null;
+  };
+  children: (RichTextNode | RichTextChild)[]; 
+}
+
 interface ComponentHeading { __component: "elements.heading"; id: number; heading: string; }
 interface ComponentRichText { __component: "elements.rich-text"; id: number; richText: RichTextNode[]; }
 interface ComponentContactButton { __component: "elements.contact-button"; id: number; label: string; phoneNumber: string; }
 interface ComponentBackgroundImage { __component: "elements.background-image"; id: number; background: { id: number; url: string; alternativeText?: string; width: number; height: number; }; }
 interface ComponentFaqItem { __component: "elements.faq-item"; id: number; title: string; isAccordion: boolean; content: RichTextNode[]; }
-export type ServicePageBlock = ComponentHeading | ComponentRichText | ComponentContactButton | ComponentBackgroundImage | ComponentFaqItem;
+interface ComponentImage { __component: "elements.image"; id: number; singleImage: { url: string; alternativeText?: string | null; width: number; height: number; }; } // ADDED ComponentImage
+
+export type ServicePageBlock = ComponentHeading | ComponentRichText | ComponentContactButton | ComponentBackgroundImage | ComponentFaqItem | ComponentImage;
 interface BlockRendererProps { blocks: ServicePageBlock[]; }
 
 // --- VARIANTS ---
@@ -27,7 +43,6 @@ const renderRichText = (nodes: (RichTextNode | RichTextChild)[], textColorClass:
   if (!nodes) return null;
 
   return nodes.map((node, index) => {
-    // 1. Handle Text Nodes (Leafs)
     if (node.type === 'text') {
       const textNode = node as any;
       let content: React.ReactNode = textNode.text;
@@ -39,7 +54,6 @@ const renderRichText = (nodes: (RichTextNode | RichTextChild)[], textColorClass:
       return <span key={index}>{content}</span>;
     }
 
-    // 2. Handle Block Nodes (Containers)
     const blockNode = node as any;
     switch (blockNode.type) {
       case 'paragraph':
@@ -65,7 +79,6 @@ const renderRichText = (nodes: (RichTextNode | RichTextChild)[], textColorClass:
       case 'list':
         const isOrdered = blockNode.format === 'ordered';
         const ListTag = isOrdered ? 'ol' : 'ul';
-        // Note: We removed the font-bold from the container so it doesn't force all text to be bold
         const listClass = isOrdered
           ? "list-decimal pl-8 mb-8"
           : "list-disc pl-8 mb-8 marker:text-[#267b9a]";
@@ -77,7 +90,6 @@ const renderRichText = (nodes: (RichTextNode | RichTextChild)[], textColorClass:
         );
 
       case 'list-item':
-        // This was the missing link!
         return (
           <li key={index} className="pl-2">
             {renderRichText(blockNode.children, textColorClass)}
@@ -102,6 +114,21 @@ const renderRichText = (nodes: (RichTextNode | RichTextChild)[], textColorClass:
           <blockquote key={index} className="border-l-4 border-[#267b9a] pl-6 my-8 italic text-slate-700 bg-slate-50 py-4 rounded-r-lg">
             {renderRichText(blockNode.children, textColorClass)}
           </blockquote>
+        );
+
+      // --- ADDED SUPPORT FOR INLINE RICH TEXT IMAGES ---
+      case 'image':
+        if (!blockNode.image?.url) return null;
+        return (
+          <div key={index} className="relative w-full my-12 rounded-[2rem] overflow-hidden shadow-xl border border-slate-200">
+            <Image
+              src={getStrapiMedia(blockNode.image.url) || ""}
+              alt={blockNode.image.alternativeText || "Service Details"}
+              width={blockNode.image.width || 1200}
+              height={blockNode.image.height || 800}
+              className="w-full h-auto object-cover"
+            />
+          </div>
         );
 
       default:
@@ -146,7 +173,7 @@ const BlockRenderer = ({ blocks }: BlockRendererProps) => {
   const heroImageBlock = blocks.find((b) => b.__component === "elements.background-image") as ComponentBackgroundImage | undefined;
   const heroHeadingBlock = blocks.find((b) => b.__component === "elements.heading") as ComponentHeading | undefined;
   const ctaButtons: ComponentContactButton[] = [];
-  blocks.forEach(b => { if (b.__component === "elements.contact-button") ctaButtons.push(b); });
+  blocks.forEach(b => { if (b.__component === "elements.contact-button") ctaButtons.push(b as ComponentContactButton); });
 
   const contentBlocks = blocks.filter((b) => {
     return b !== heroImageBlock && b !== heroHeadingBlock && !ctaButtons.includes(b as ComponentContactButton);
@@ -158,14 +185,13 @@ const BlockRenderer = ({ blocks }: BlockRendererProps) => {
       {/* --- HERO BANNER --- */}
       {(heroImageBlock || heroHeadingBlock) && (
         <section className="relative w-full min-h-[85vh] flex items-center justify-center bg-[#0f172a] overflow-hidden px-4">
-          {/* Tech FX */}
           <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-[#267b9a] rounded-full mix-blend-screen filter blur-[150px] opacity-20 animate-pulse pointer-events-none" />
           <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-purple-900 rounded-full mix-blend-screen filter blur-[150px] opacity-20 pointer-events-none" />
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.04]" />
 
           {heroImageBlock?.background?.url && (
             <div className="absolute inset-0 w-full h-full z-0">
-              <Image src={heroImageBlock.background.url} alt="Hero" fill className="object-cover opacity-40 mix-blend-overlay" priority />
+              <Image src={getStrapiMedia(heroImageBlock.background.url) || ""} alt="Hero" fill className="object-cover opacity-40 mix-blend-overlay" priority />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/90 to-transparent" />
             </div>
           )}
@@ -179,7 +205,8 @@ const BlockRenderer = ({ blocks }: BlockRendererProps) => {
                   animate={{ width: 96 }}
                   transition={{ delay: 0.5, duration: 0.8 }}
                   className="h-1.5 bg-gradient-to-r from-[#267b9a] to-cyan-400 rounded-full shadow-[0_0_20px_rgba(38,123,154,0.6)] mx-auto mb-10"
-                />              </div>
+                />              
+              </div>
             </motion.div>
           )}
         </section>
@@ -188,7 +215,7 @@ const BlockRenderer = ({ blocks }: BlockRendererProps) => {
       {/* --- CONTENT --- */}
       <div className="flex-grow max-w-6xl mx-auto px-6 py-24 w-full">
         {contentBlocks.map((block, index) => {
-          const key = `${block.__component}-${block.id}-${index}`;
+          const key = `${block.__component}-${index}`;
           const BlockWrapper = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => (
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeInUp} className={className}>{children}</motion.div>
           );
@@ -201,21 +228,34 @@ const BlockRenderer = ({ blocks }: BlockRendererProps) => {
                   <div className="w-16 h-1 bg-[#267b9a] mt-6 rounded-full" />
                 </BlockWrapper>
               );
+              
             case 'elements.rich-text':
               return (
                 <BlockWrapper key={key} className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-slate-900 prose-p:text-slate-600">
                   {renderRichText(block.richText, "text-slate-600")}
                 </BlockWrapper>
               );
+
             case 'elements.faq-item':
               return <motion.div key={key} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeInUp}><FaqAccordion block={block} /></motion.div>;
+            
             case 'elements.background-image':
               if (!block.background?.url) return null;
               return (
                 <BlockWrapper key={key} className="relative w-full my-20 rounded-[2rem] overflow-hidden shadow-2xl border border-slate-200">
-                  <Image src={block.background.url} alt="Image" width={block.background.width} height={block.background.height} style={{ width: '100%', height: 'auto' }} className="object-cover" />
+                  <Image src={getStrapiMedia(block.background.url) || ""} alt="Image" width={block.background.width} height={block.background.height} style={{ width: '100%', height: 'auto' }} className="object-cover" />
                 </BlockWrapper>
               );
+
+            // --- ADDED SUPPORT FOR STANDALONE IMAGE COMPONENT ---
+            case 'elements.image':
+              if (!block.singleImage?.url) return null;
+              return (
+                <BlockWrapper key={key} className="relative w-full my-20 rounded-[2rem] overflow-hidden shadow-2xl border border-slate-200">
+                  <Image src={getStrapiMedia(block.singleImage.url) || ""} alt="Service visual" width={block.singleImage.width || 1200} height={block.singleImage.height || 800} style={{ width: '100%', height: 'auto' }} className="object-cover" />
+                </BlockWrapper>
+              );
+
             default: return null;
           }
         })}
@@ -225,8 +265,6 @@ const BlockRenderer = ({ blocks }: BlockRendererProps) => {
       <section className="px-6 pb-24 relative overflow-hidden bg-slate-50/50">
         <motion.div initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="max-w-6xl mx-auto relative group">
           <div className="relative overflow-hidden rounded-[3rem] bg-[#0f172a] shadow-[0_40px_80px_rgba(0,0,0,0.4)]">
-
-            {/* CTA Background FX */}
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#267b9a] rounded-full mix-blend-screen filter blur-[120px] opacity-30 animate-pulse" />
               <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-purple-900 rounded-full mix-blend-screen filter blur-[100px] opacity-30" />
@@ -248,7 +286,7 @@ const BlockRenderer = ({ blocks }: BlockRendererProps) => {
               <div className="shrink-0">
                 <Link href="/contact-us" className="group/btn relative inline-flex items-center justify-center">
                   <div className="absolute -inset-1 bg-gradient-to-r from-[#267b9a] to-cyan-400 rounded-xl blur opacity-40 group-hover/btn:opacity-75 transition duration-500" />
-                  <button className="relative px-12 py-6 bg-white text-[#0f172a] text-sm font-bold uppercase tracking-widest rounded-xl transition-all duration-300 transform group-hover/btn:-translate-y-1 group-active/btn:translate-y-0 flex items-center gap-3">
+                  <button className="relative px-12 py-6 bg-white text-[#0f172a] text-sm font-bold uppercase tracking-widest rounded-xl transition-all duration-300 transform group-hover/btn:-translate-y-1 flex items-center gap-3">
                     Let's Talk Strategy
                     <svg className="w-5 h-5 text-[#267b9a] transition-transform group-hover/btn:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                   </button>

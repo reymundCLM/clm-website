@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion, Variants } from "framer-motion";
-import { LandingPageData } from "@/lib/api";
+import { LandingPageData, getStrapiMedia } from "@/lib/api";
 
 interface VideoHeroProps {
   data: LandingPageData | null;
@@ -51,14 +51,9 @@ const VideoHero: React.FC<VideoHeroProps> = ({ data }) => {
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black">
       {/* Video Background */}
       <div className="absolute inset-0 z-10 overflow-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="h-full w-full object-cover opacity-50 scale-105"
-        >
-          <source src={data.heroBackgound.url} type={data.heroBackgound.mime} />
+        <video autoPlay loop muted playsInline className="h-full w-full object-cover opacity-50 scale-105">
+          {/* 2. Wrap the url with the helper */}
+          <source src={getStrapiMedia(data.heroBackgound.url) || ""} type={data.heroBackgound.mime} />
         </video>
       </div>
 

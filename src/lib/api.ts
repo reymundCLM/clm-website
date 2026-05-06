@@ -315,6 +315,31 @@ export interface ComponentImage {
   };
 }
 
+// Add this to the bottom of src/lib/api.ts
+export function getStrapiMedia(url: string | null | undefined) {
+  if (!url) return null;
+
+  // 1. INTERCEPT & REWRITE OLD CLOUD URLS
+  if (url.includes("ancient-crown-9dfaf5bb18.media.strapiapp.com")) {
+    try {
+      const urlObj = new URL(url);
+      // This strips away the old domain and attaches your new Droplet domain
+      // Example: https://ancient.../uploads/image.jpg -> https://strapi.confluencelocalmarketing.com/uploads/image.jpg
+      return `${STRAPI_URL}${urlObj.pathname}`; 
+    } catch (e) {
+      console.error("Failed to parse URL:", url);
+    }
+  }
+
+  // 2. LEAVE OTHER EXTERNAL URLS ALONE (e.g., YouTube, regular Cloudinary, etc.)
+  if (url.startsWith("http") || url.startsWith("//")) {
+    return url;
+  }
+
+  // 3. HANDLE STANDARD RELATIVE URLS (/uploads/...)
+  return `${STRAPI_URL}${url}`;
+}
+
 // --- Logic (Navigation Tree) ---
 
 function recursivelyBuildPaths(items: NavigationItem[], parentPath: string = "") {

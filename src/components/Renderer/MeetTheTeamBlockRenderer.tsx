@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, Variants, AnimatePresence } from "framer-motion";
+import { getStrapiMedia } from '@/lib/api'; // ADDED IMPORTS
 
 import {
   MeetTheTeamBlock,
@@ -107,7 +108,6 @@ const TeamCard = ({ card }: { card: any }) => {
   const [isOpen, setIsOpen] = useState(false);
   const altText = card.image?.alternativeText || card.title || "Team Member";
 
-  // Updated check: Strapi Cloud provides the URL directly in card.image.url
   const hasImage = card.image && card.image.url;
   const hasIcon = card.icon && card.icon.iconData;
 
@@ -116,7 +116,6 @@ const TeamCard = ({ card }: { card: any }) => {
     animate: { opacity: 1, y: 0 },
   };
 
-  // Helper function to render SVG icons correctly using API dimensions
   const renderIcon = (containerClassName: string) => (
     <div className={containerClassName}>
       <svg
@@ -134,53 +133,22 @@ const TeamCard = ({ card }: { card: any }) => {
         layoutId={`card-container-${card.id}`}
         onClick={() => setIsOpen(true)}
         variants={fadeInUp}
-        // FIX: Only allow hover scaling when the modal is closed to prevent 
-        // the "stuck" shrinking effect when the mouse is over the closing card.
-        // whileHover={!isOpen ? { y: -5 } : {}}
-        // transition={{
-        //   layout: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
-        // }}
         className="group relative flex flex-col items-center p-8 bg-white rounded-[2.5rem] shadow-md hover:shadow-2xl border border-slate-100 cursor-pointer-none transition-all duration-500 overflow-hidden"
       >
         {/* --- CARD BLOBS --- */}
-        <motion.div
-          animate={{ borderRadius: ["40% 60% 70% 30%", "60% 40% 30% 70%", "40% 60% 70% 30%"] }}
-          transition={{ duration: 10, repeat: Infinity }}
-          className="absolute -top-8 -left-8 w-24 h-24 bg-[#267b9a]/10 pointer-events-none group-hover:bg-[#267b9a]/20 transition-colors"
-        />
-        <motion.div
-          animate={{ borderRadius: ["30% 70% 60% 40%", "50% 50% 30% 70%", "30% 70% 60% 40%"] }}
-          transition={{ duration: 12, repeat: Infinity }}
-          className="absolute -bottom-8 -right-8 w-28 h-28 bg-[#267b9a]/5 pointer-events-none group-hover:bg-[#267b9a]/15 transition-colors"
-        />
-        <motion.div
-          animate={{ borderRadius: ["20% 80% 20% 80%", "80% 20% 80% 20%", "20% 80% 20% 80%"], rotate: [0, 90, 0] }}
-          transition={{ duration: 15, repeat: Infinity }}
-          className="absolute top-4 -right-6 w-16 h-16 bg-cyan-400/10 pointer-events-none group-hover:bg-cyan-400/20 transition-colors blur-lg"
-        />
-        <motion.div
-          animate={{ borderRadius: ["60% 40% 50% 50%", "40% 60% 30% 70%", "60% 40% 50% 50%"], scale: [1, 1.1, 1] }}
-          transition={{ duration: 18, repeat: Infinity }}
-          className="absolute bottom-10 -left-4 w-12 h-12 bg-[#267b9a]/5 pointer-events-none group-hover:bg-[#267b9a]/15 transition-colors"
-        />
-        <motion.div
-          animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.02, 0.08, 0.02] }}
-          transition={{ duration: 8, repeat: Infinity }}
-          className="absolute top-1/3 left-1/3 w-32 h-32 rounded-full bg-cyan-600/5 pointer-events-none blur-2xl"
-        />
+        <motion.div animate={{ borderRadius: ["40% 60% 70% 30%", "60% 40% 30% 70%", "40% 60% 70% 30%"] }} transition={{ duration: 10, repeat: Infinity }} className="absolute -top-8 -left-8 w-24 h-24 bg-[#267b9a]/10 pointer-events-none group-hover:bg-[#267b9a]/20 transition-colors" />
+        <motion.div animate={{ borderRadius: ["30% 70% 60% 40%", "50% 50% 30% 70%", "30% 70% 60% 40%"] }} transition={{ duration: 12, repeat: Infinity }} className="absolute -bottom-8 -right-8 w-28 h-28 bg-[#267b9a]/5 pointer-events-none group-hover:bg-[#267b9a]/15 transition-colors" />
+        <motion.div animate={{ borderRadius: ["20% 80% 20% 80%", "80% 20% 80% 20%", "20% 80% 20% 80%"], rotate: [0, 90, 0] }} transition={{ duration: 15, repeat: Infinity }} className="absolute top-4 -right-6 w-16 h-16 bg-cyan-400/10 pointer-events-none group-hover:bg-cyan-400/20 transition-colors blur-lg" />
+        <motion.div animate={{ borderRadius: ["60% 40% 50% 50%", "40% 60% 30% 70%", "60% 40% 50% 50%"], scale: [1, 1.1, 1] }} transition={{ duration: 18, repeat: Infinity }} className="absolute bottom-10 -left-4 w-12 h-12 bg-[#267b9a]/5 pointer-events-none group-hover:bg-[#267b9a]/15 transition-colors" />
+        <motion.div animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.02, 0.08, 0.02] }} transition={{ duration: 8, repeat: Infinity }} className="absolute top-1/3 left-1/3 w-32 h-32 rounded-full bg-cyan-600/5 pointer-events-none blur-2xl" />
 
         {/* Compact Avatar with Pulse Effect */}
         <div className="relative w-32 h-32 mb-6 z-10 flex items-center justify-center">
           <div className="absolute inset-0 rounded-full border-2 border-[#267b9a] opacity-0 group-hover:animate-ping" />
           <div className="relative w-28 h-28 rounded-full border-[3px] border-white shadow-lg overflow-hidden bg-slate-50 flex items-center justify-center">
             {hasImage ? (
-              <Image
-                src={card.image.url}
-                alt={card.title}
-                fill
-                className="object-cover"
-                unoptimized
-              />
+              // UPDATED: Wrapped url with getStrapiMedia
+              <Image src={getStrapiMedia(card.image.url) || ""} alt={card.title} fill className="object-cover" unoptimized />
             ) : hasIcon ? (
               renderIcon("w-full h-full flex items-center justify-center p-6 text-[#267b9a]")
             ) : (
@@ -207,72 +175,27 @@ const TeamCard = ({ card }: { card: any }) => {
       <AnimatePresence>
         {isOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
-              className="absolute inset-0 bg-[#0f172a]/90 backdrop-blur-xl"
-            />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsOpen(false)} className="absolute inset-0 bg-[#0f172a]/90 backdrop-blur-xl" />
 
-            <motion.div
-              layoutId={`card-container-${card.id}`}
-              className="relative w-full max-w-4xl bg-white rounded-[3rem] overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] md:max-h-none overflow-y-auto md:overflow-visible"
-            >
-              {/* --- CLOSE BUTTON WITH DARK TEAL ANIMATED BLOB --- */}
+            <motion.div layoutId={`card-container-${card.id}`} className="relative w-full max-w-4xl bg-white rounded-[3rem] overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] md:max-h-none overflow-y-auto md:overflow-visible">
+              
               <div className="absolute top-6 right-6 z-50">
-                {/* Background Glow Blob */}
-                <motion.div
-                  animate={{
-                    scale: [1, 1.3, 1],
-                    borderRadius: ["30% 70% 70% 30% / 30% 30% 70% 70%", "60% 40% 40% 60% / 60% 60% 40% 40%", "30% 70% 70% 30% / 30% 30% 70% 70%"],
-                    rotate: [0, 90, 0]
-                  }}
-                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute inset-0 bg-[#1a5a73] opacity-60 blur-xl scale-125"
-                />
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsOpen(false);
-                  }}
-                  className="relative w-12 h-12 bg-white text-[#267b9a] hover:bg-[#267b9a] hover:text-white rounded-full flex items-center justify-center transition-colors shadow-lg group"
-                >
-                  <svg className="w-6 h-6 transform transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                <motion.div animate={{ scale: [1, 1.3, 1], borderRadius: ["30% 70% 70% 30% / 30% 30% 70% 70%", "60% 40% 40% 60% / 60% 60% 40% 40%", "30% 70% 70% 30% / 30% 30% 70% 70%"], rotate: [0, 90, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="absolute inset-0 bg-[#1a5a73] opacity-60 blur-xl scale-125" />
+                <button onClick={(e) => { e.stopPropagation(); setIsOpen(false); }} className="relative w-12 h-12 bg-white text-[#267b9a] hover:bg-[#267b9a] hover:text-white rounded-full flex items-center justify-center transition-colors shadow-lg group">
+                  <svg className="w-6 h-6 transform transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
 
-              {/* Left Side: Circular Image/Icon with Blobs */}
               <div className="w-full md:w-2/5 relative min-h-[300px] md:h-auto bg-slate-50 border-r border-slate-100 flex items-center justify-center overflow-hidden">
-                <motion.div
-                  animate={{ borderRadius: ["30% 70% 70% 30% / 30% 30% 70% 70%", "60% 40% 40% 60% / 60% 60% 40% 40%"], rotate: [0, 10, -10, 0] }}
-                  transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                  className="absolute w-[140%] h-[140%] bg-[#267b9a]/5 pointer-events-none"
-                />
-                <motion.div
-                  animate={{ borderRadius: ["50% 50% 20% 80% / 25% 80% 20% 67%", "67% 20% 80% 25% / 80% 20% 67% 25%"] }}
-                  transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-                  className="absolute w-64 h-64 bg-[#267b9a]/10 pointer-events-none blur-xl"
-                />
-                <motion.div
-                  animate={{ y: [-10, 10, -10], x: [5, -5, 5] }}
-                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute top-10 right-10 w-32 h-32 bg-cyan-300/10 rounded-full blur-2xl pointer-events-none"
-                />
+                <motion.div animate={{ borderRadius: ["30% 70% 70% 30% / 30% 30% 70% 70%", "60% 40% 40% 60% / 60% 60% 40% 40%"], rotate: [0, 10, -10, 0] }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} className="absolute w-[140%] h-[140%] bg-[#267b9a]/5 pointer-events-none" />
+                <motion.div animate={{ borderRadius: ["50% 50% 20% 80% / 25% 80% 20% 67%", "67% 20% 80% 25% / 80% 20% 67% 25%"] }} transition={{ duration: 12, repeat: Infinity, ease: "linear" }} className="absolute w-64 h-64 bg-[#267b9a]/10 pointer-events-none blur-xl" />
+                <motion.div animate={{ y: [-10, 10, -10], x: [5, -5, 5] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="absolute top-10 right-10 w-32 h-32 bg-cyan-300/10 rounded-full blur-2xl pointer-events-none" />
 
                 <div className="relative w-48 h-48 md:w-56 md:h-56 rounded-full border-[6px] border-white shadow-2xl z-10 bg-white">
                   <div className="relative w-full h-full rounded-full overflow-hidden">
                     {hasImage ? (
-                      <Image
-                        src={card.image.url}
-                        alt={altText}
-                        fill
-                        className="object-cover"
-                        unoptimized
-                      />
+                      // UPDATED: Wrapped url with getStrapiMedia
+                      <Image src={getStrapiMedia(card.image.url) || ""} alt={altText} fill className="object-cover" unoptimized />
                     ) : hasIcon ? (
                       renderIcon("w-full h-full flex items-center justify-center p-10 text-[#267b9a]")
                     ) : (
@@ -287,12 +210,8 @@ const TeamCard = ({ card }: { card: any }) => {
               {/* Right Side: Bio */}
               <div className="w-full md:w-3/5 p-8 md:p-14 flex flex-col justify-center bg-white relative z-10">
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="relative z-20">
-                  <span className="inline-block text-[#267b9a] font-black uppercase tracking-[0.3em] text-[10px] mb-4">
-                    {card.position || "Team Member"}
-                  </span>
-                  <h2 className="text-4xl font-black text-[#0f172a] mb-6 tracking-tight leading-none">
-                    {card.title}
-                  </h2>
+                  <span className="inline-block text-[#267b9a] font-black uppercase tracking-[0.3em] text-[10px] mb-4">{card.position || "Team Member"}</span>
+                  <h2 className="text-4xl font-black text-[#0f172a] mb-6 tracking-tight leading-none">{card.title}</h2>
                   <div className="w-20 h-1.5 mb-8 rounded-full overflow-hidden relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-[#267b9a] to-cyan-400" />
                     <motion.div animate={{ x: ["-100%", "100%"] }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent w-full h-full" />
@@ -300,14 +219,10 @@ const TeamCard = ({ card }: { card: any }) => {
                   <div className="relative w-full mb-10 p-6 rounded-2xl overflow-hidden group/wave">
                     <div className="absolute inset-0 opacity-20 pointer-events-none">
                       <motion.div animate={{ x: ["0%", "-50%"] }} transition={{ duration: 10, repeat: Infinity, ease: "linear" }} className="absolute top-0 left-0 w-[200%] h-full flex items-end">
-                        <svg className="w-full h-full text-[#267b9a] fill-current" viewBox="0 0 1440 320" preserveAspectRatio="none">
-                          <path fillOpacity="1" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-                        </svg>
+                        <svg className="w-full h-full text-[#267b9a] fill-current" viewBox="0 0 1440 320" preserveAspectRatio="none"><path fillOpacity="1" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,261.3C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>
                       </motion.div>
                     </div>
-                    <div className="prose prose-slate prose-lg max-w-none text-slate-700 leading-relaxed italic relative z-10">
-                      {card.description}
-                    </div>
+                    <div className="prose prose-slate prose-lg max-w-none text-slate-700 leading-relaxed italic relative z-10">{card.description}</div>
                   </div>
                   <Link href="/contact-us" className="inline-block px-8 py-4 bg-[#267b9a] text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-[#0f172a] transition-all transform hover:-translate-y-1 shadow-lg shadow-[#267b9a]/20">
                     Connect with {card.title.split(' ')[0]}
@@ -389,8 +304,9 @@ export default function MeetTheTeamRenderer({ blocks }: RendererProps) {
 
         {heroImage && heroImage.__component === 'elements.background-image' && heroImage.background?.url && (
           <div className="absolute inset-0 w-full h-full z-0">
+            {/* UPDATED: Wrapped url with getStrapiMedia */}
             <Image
-              src={heroImage.background.url}
+              src={getStrapiMedia(heroImage.background.url) || ""}
               alt={heroImage.background.alternativeText || "Hero Background"}
               fill
               className="object-cover opacity-40 mix-blend-overlay"
@@ -499,12 +415,9 @@ export default function MeetTheTeamRenderer({ blocks }: RendererProps) {
       <section className="px-6 pb-24 relative overflow-hidden bg-slate-50/50">
         <motion.div initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="max-w-6xl mx-auto relative group">
           <div className="relative overflow-hidden rounded-[3rem] bg-[#0f172a] shadow-[0_40px_80px_rgba(0,0,0,0.4)]">
-
-            {/* CTA Background FX */}
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#267b9a] rounded-full mix-blend-screen filter blur-[120px] opacity-30 animate-pulse" />
               <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-purple-900 rounded-full mix-blend-screen filter blur-[100px] opacity-30" />
-              <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 contrast-150" />
             </div>
 
             <div className="relative z-10 px-10 py-24 md:px-24 flex flex-col lg:flex-row items-center justify-between gap-12 text-center lg:text-left">
