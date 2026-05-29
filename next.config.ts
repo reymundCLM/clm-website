@@ -1,13 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async redirects() { // Change back to redirects
+  async redirects() { 
     return [
-      {
-        source: '/sitemap.xml',
-        destination: 'https://app.promptgraph.ai/api/v1/confluence-local-marketing/sitemap.xml',
-        permanent: false,
-      },
+      // Removed the /sitemap.xml redirect from here so Next.js uses your sitemap.ts file!
       {
         source: '/openapi.json',
         destination: 'https://app.promptgraph.ai/api/v1/confluence-local-marketing/openapi.json',
@@ -27,19 +23,19 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-  remotePatterns: [
-    {
-      protocol: 'https',
-      hostname: 'strapi.confluencelocalmarketing.com',
-      pathname: '/**',
-    },
-    {
-      protocol: 'http',
-      hostname: 'strapi.confluencelocalmarketing.com',
-      pathname: '/**',
-    },
-  ],
-},
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'strapi.confluencelocalmarketing.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'strapi.confluencelocalmarketing.com',
+        pathname: '/**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;
