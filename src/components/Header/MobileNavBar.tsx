@@ -65,7 +65,7 @@ const MobileNavItem: React.FC<{ item: NavigationItem; onClose: () => void; depth
         <Link
           href={item.path}
           onClick={onClose}
-          className={`flex items-center py-4 w-full transition-all ${depth === 0 ? "text-slate-100 hover:text-white border-b border-white/5 font-black uppercase tracking-widest text-xl" : "font-medium text-md text-slate-300 hover:text-white"}`}
+          className={`flex items-center py-4 w-full transition-all ${depth === 0 ? "border-b border-white/5 font-black uppercase tracking-widest text-xl" : "font-medium text-md text-slate-300 hover:text-white"}`}
         >
           {item.title}
         </Link>
