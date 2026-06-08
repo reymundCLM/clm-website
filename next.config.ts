@@ -3,7 +3,6 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   async redirects() { 
     return [
-      // Removed the /sitemap.xml redirect from here so Next.js uses your sitemap.ts file!
       {
         source: '/openapi.json',
         destination: 'https://app.promptgraph.ai/api/v1/confluence-local-marketing/openapi.json',
@@ -16,9 +15,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // The eslint block has been safely removed from here!
   typescript: {
     ignoreBuildErrors: true,
   },
