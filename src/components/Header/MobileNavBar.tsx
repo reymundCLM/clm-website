@@ -43,6 +43,15 @@ const MobileNavbar: React.FC<MobileNavbarProps> = ({ navItems, onClose }) => {
 
 const MobileNavItem: React.FC<{ item: NavigationItem; onClose: () => void; depth: number }> = ({ item, onClose, depth }) => {
   const [isOpen, setIsOpen] = useState(false);
+  
+  // 1. SILENTLY DROP EMPTY ITEMS: 
+  // Prevents empty Strapi column wrappers from creating massive dark gaps.
+  if (!item.title || item.title.trim() === "") return null;
+
+  // 2. STRIP MANUAL BULLET POINTS:
+  // Cleans up the text if you manually typed "• " in the Strapi CMS.
+  const cleanTitle = item.title.replace(/[•▪-]/g, '').trim();
+  
   const hasChildren = item.items && item.items.length > 0;
 
   return (
@@ -50,10 +59,16 @@ const MobileNavItem: React.FC<{ item: NavigationItem; onClose: () => void; depth
       {hasChildren ? (
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`flex justify-between items-center py-4 w-full text-left transition-all ${depth === 0 ? "border-b border-white/5" : ""}`}
+          className={`flex justify-between items-center w-full text-left transition-all ${
+            depth === 0 ? "py-4 border-b border-white/5" : "py-2.5"
+          }`}
         >
-          <span className={`${depth === 0 ? "text-xl font-black uppercase tracking-widest" : "text-md font-medium"} ${isOpen ? 'text-[#267b9a]' : 'text-slate-100'}`}>
-            {item.title}
+          <span className={`${
+            depth === 0 
+              ? "text-xl font-black uppercase tracking-widest" 
+              : "text-[15px] font-medium"
+          } ${isOpen ? 'text-[#267b9a]' : 'text-slate-100'}`}>
+            {cleanTitle}
           </span>
           <div className={`transition-transform duration-300 ${isOpen ? "rotate-180 text-[#267b9a]" : "text-slate-500"}`}>
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -65,23 +80,31 @@ const MobileNavItem: React.FC<{ item: NavigationItem; onClose: () => void; depth
         <Link
           href={item.path}
           onClick={onClose}
-          className={`flex items-center py-4 w-full transition-all ${depth === 0 ? "border-b border-white/5 font-black uppercase tracking-widest text-xl" : "font-medium text-md text-slate-300 hover:text-white"}`}
+          className={`flex items-center w-full transition-all ${
+            depth === 0 
+              ? "py-4 border-b border-white/5 font-black uppercase tracking-widest text-xl text-slate-100 hover:text-white" 
+              : "py-2.5 font-medium text-[15px] text-slate-300 hover:text-white"
+          }`}
         >
-          {item.title}
+          {cleanTitle}
         </Link>
       )}
 
-      <AnimatePresence>
+      <AnimatePresence initial={false}>
         {hasChildren && isOpen && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden flex flex-col pl-4 border-l-2 border-[#267b9a]/30 ml-1"
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
           >
-            {item.items.map((child) => (
-              <MobileNavItem key={child.id} item={child} onClose={onClose} depth={depth + 1} />
-            ))}
+            {/* Framer motion works best when the padding is on an inner div, not the animated wrapper */}
+            <div className="flex flex-col pl-4 border-l-2 border-[#267b9a]/30 ml-1 py-2">
+              {item.items.map((child) => (
+                <MobileNavItem key={child.id} item={child} onClose={onClose} depth={depth + 1} />
+              ))}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
